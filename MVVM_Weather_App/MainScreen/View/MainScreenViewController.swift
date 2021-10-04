@@ -16,6 +16,7 @@ class MainScreenViewController: UIViewController {
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var temperatureFarenheightLabel: UILabel!
     @IBOutlet weak var timeLabel: UILabel!
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     
     private let viewModel = MainScreenViewModel()
     private let disposeBag = DisposeBag()
@@ -63,6 +64,15 @@ class MainScreenViewController: UIViewController {
                     self?.temperatureCelsiusLabel.isHidden = true
                 }
                 self?.showCelsius = show
+            }).disposed(by: disposeBag)
+        viewModel.loading
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: {[weak self] loading in
+                if loading {
+                    self?.loadingIndicator.startAnimating()
+                } else {
+                    self?.loadingIndicator.stopAnimating()
+                }
             }).disposed(by: disposeBag)
         searchField.rx.text.orEmpty
             .throttle(.microseconds(500), scheduler: MainScheduler.instance)

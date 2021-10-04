@@ -39,7 +39,7 @@ class ApiManager {
     
     static func requestCityData(cityName: String, completion: @escaping (Result<CityWeather, RequestError>) -> Void) {
         
-        let header: [String: String] = ["Content-Type": "application/json"]
+            let header: [String: String] = ["Content-Type": "application/json"]
         guard let url = URL(string: baseUrl + "?key=\(apiKey)&q=\(cityName)&aqi=no") else { return }
         var request = URLRequest(url: url)
         
@@ -54,13 +54,11 @@ class ApiManager {
                     do {
                         let responseJson = try? JSON(data: data)
                         guard let cityName = responseJson?["location"]["name"].string else { return }
+                        guard let region = responseJson?["location"]["region"].string else { return }
                         guard let time = responseJson?["location"]["localtime"].string else { return }
                         guard let temperature_c = responseJson?["current"]["temp_c"].double else { return }
                         guard let temperature_f = responseJson?["current"]["temp_f"].double else { return }
-                        let city = CityWeather(name: cityName,
-                                               time: time,
-                                               temperature_c: temperature_c,
-                                               temperature_f: temperature_f)
+                        let city = CityWeather.returnCity(cityName: cityName, region: region, time: time, temperature_c: temperature_c, temperature_f: temperature_f)
                         completion(.success(city))
                     }
                 case 400...499:

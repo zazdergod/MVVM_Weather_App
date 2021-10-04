@@ -21,22 +21,16 @@ class MainScreenViewModel {
     
     public func requestData(searchString: String) {
         self.loading.onNext(true)
-        ApiManager.requestCityData(cityName: searchString) {[weak self] result in
+        CityWeather.getWeather(city: searchString) {[weak self] city in
             self?.loading.onNext(false)
-            switch result {
-            case .success(let city):
-                self?.city.onNext(city)
-            case .failure(let error):
-                print(error)
-                self?.city.onNext(CityWeather(name: "", time: "", temperature_c: nil, temperature_f: nil))
-            }
+            self?.city.onNext(city)
         }
     }
     
-    public func convertTime(dateTime: String) -> String {
+    public func convertTime(dateTime: String?) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "YYYY-MM-DD HH:mm"
-        let date = formatter.date(from: dateTime)
+        let date = formatter.date(from: dateTime ?? "")
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date ?? Date())
     }
